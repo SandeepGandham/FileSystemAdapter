@@ -1,0 +1,1 @@
+{freeSpace=316403130368, driveName=/, totalSpace=351924879360, type=null}

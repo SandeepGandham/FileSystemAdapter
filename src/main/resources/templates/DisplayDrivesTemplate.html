@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Simple Page</title>
+        <!-- <meta charset="utf-8"> -->
+        <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <style>
+            body{
+                background-color: #e8e8e8;
+            }
+            .navbar {
+                margin-bottom: 10px;
+                border-radius: 0 !important;
+            }
+
+            .navbar-inverse .navbar-nav>li>a {
+                color: #fff;
+            }
+            .navbar-brand {
+                padding: 8px 15px;
+                height: auto;
+            }
+            .navbar-inverse .navbar-text {
+                color: #fff;
+            }
+            .panel-body {
+                padding: 15px;
+                padding-top: 0px;
+            }
+            * {
+                box-sizing: border-box;
+            }
+            div {
+                display: block;
+            }
+            .panel-default {
+                border-top-width: 3px;
+                border: 1px solid #dddddd;
+                border-top: 1px solid #1781be;
+                border-radius: 4px;
+                padding: 15px;
+                border-color: #0b3055;
+            }
+            .panel {
+                padding: 15px;
+                border: 1px solid transparent;
+                background-color: #fff;
+                -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+                box-shadow: 0 1px 1px rgba(7, 7, 7, 0.05);
+            }
+            .panel-title>h3{
+                margin: 0;
+            }
+                    /* .panel {
+                margin-bottom: 21px;
+                background-color: rgb(255, 255, 255);
+                border: 1px solid transparent;
+                border-radius: 4px;
+                box-shadow: 0 1px 1px rgba(7, 7, 7, 0.05);
+            } */
+            .page-heading {
+                font-size: 24px;
+                line-height: 1.1;
+                color: #505050;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+                padding-left: 40px;
+                font-weight: normal;
+                border-bottom: 1px solid #cfdbe2;
+            }
+            navbar-inverse .navbar-nav>.open>a, .navbar-inverse .navbar-nav>.open>a:focus, .navbar-inverse .navbar-nav>.open>a:hover {
+                color: #fff;
+                background-color: #7266ba;
+            }
+            img {
+                vertical-align: middle;
+            }
+            .bg-primary {
+                /* color: rgb(57, 10, 95); */
+                background-color: #7266ba;
+                border-color: #7266ba;
+            }
+            .navbar {
+                height: 56px;
+                text-align: center;
+            }
+            .navbar-header {
+                text-align: center;
+                text-decoration-color: #fff;
+                padding-left: 5px;
+                padding-top: 3px;
+            }
+
+            .page-heading small {
+                display: block;
+                font-size: 12px;
+                color: #909FA7;
+            }
+        </style>
+        <script>
+            function send(){
+            var values = new Array();
+            $.each($("input[name='CheckGroup[]']:checked"), function(){
+                values.push($(this).val());
+            });
+            var Json = {
+                "Key" : values };
+            $.ajax({
+                url: '/filewalker',
+                type: 'POST',
+                data: JSON.stringify(Json),
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function(data){
+                    alert(data);
+                }
+            });
+
+        }
+        </script>
+        <script>
+            $(document).ready(function() {
+            var options = {
+                beforeSend : function() {
+                        $("#progressbox").show();
+                        // clear everything
+                        $("#progressbar").width('0%');
+                        $("#message").empty();
+                        $("#percent").html("0%");
+                },
+                uploadProgress : function(event, position, total, percentComplete) {
+                        $("#progressbar").width(percentComplete + '%');
+                        $("#percent").html(percentComplete + '%');
+
+                        // change message text to red after 50%
+                        if (percentComplete > 50) {
+                        $("#message").html("<font color='red'>File Upload is in progress</font>");
+                        }
+                },
+                success : function() {
+                        $("#progressbar").width('100%');
+                        $("#percent").html('100%');
+                },
+                complete : function(response) {
+                $("#message").html("<font color='blue'>Your file has been uploaded!</font>");
+                },
+                error : function() {
+                $("#message").html("<font color='red'> ERROR: unable to upload files</font>");
+                }
+            };
+            $("#UploadForm").ajaxForm(options);
+            });
+        </script>
+
+    </head>
+    
+    <body>
+
+    <nav class="navbar navbar-inverse bg-primary">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <!-- <a class="brand-logo"></a> -->
+                <img src="esalidalogo.png" class="navbar-brand img-responsive"/>
+            </div>
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Dashboard<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Email</a></li>
+                            <li><a href="#">Appointment</a></li>
+                            <li><a href="#">Contact</a></li>
+                            <li><a href="#">File</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Employees</a></li>
+                    <li><a href="#">Search</a></li>
+                    <li><a href="#">Collection</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <p class="navbar-text">Shirisha</p>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="page-heading">
+        Welcome page
+        <small>Use accordingly!</small>
+    </div>
+    <div class="panel panel-default col-md-8 col-md-offset-2">
+        <div class="panel-title text-center">
+            <h3>Processing Form</h3>
+        </div>
+        <div class="panel-body col-md-6 col-md-offset-3">
+            <div th:each="drive : ${listDrives}">
+                <div th:each="driveData : ${drive}">
+                    <div th:each="driveValue, iter : ${driveData.value}">
+                        <div th:if="${driveValue.key} == driveName">
+                            <div id="var" class="checkbox form-group">
+                                <label><input type="checkbox" id="iter.index" name="CheckGroup[]" th:value="${driveValue.value}" th:text="${driveValue.value}"/> </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:each="driveValue : ${driveData.value}">
+                        <div th:if="${driveValue.key} == totalSpace or ${driveValue.key}==freeSpace">
+                            <div th:with="result = ${driveValue.value / (1024 * 1024)}">
+                                <span th:text="${driveValue.key}"></span> = <span th:text="${result} + '  GB'"> </span>
+                            </div>
+                        </div>
+                        <div th:unless = "${driveValue.key} == totalSpace or ${driveValue.key}==freeSpace">
+
+                            <span th:text="${driveValue.key}"></span> = <span th:text="${driveValue.value}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" aria-valuenow="40"
+                     aria-valuemin="0" aria-valuemax="100" style="width:40%">
+                    <p>40% Complete</p>
+                </div>
+            </div>
+
+            <div class="col-md-10 center-block">
+                <button class="btn btn-normal center-block" th:onclick="'javascript:send()'">Proceed</button>
+            </div>
+        </div>
+    </div>
+    </body>
+</html>
