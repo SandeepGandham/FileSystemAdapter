@@ -41,7 +41,7 @@ public class FileWalkerController {
         //CompletableFuture<List<String>> folder = new CompletableFuture<List<String>>();
         for( String drive : drives){
 
-            fileWalkerService.callFileWalker("/home/vivek/Sandeep");
+            fileWalkerService.callFileWalker(drive);
         }
         return "Finished";
     }

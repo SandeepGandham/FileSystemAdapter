@@ -13,9 +13,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,6 +30,8 @@ public class FileWalkerService {
 
     private String fileUpoadEndPoint = "/client/upload";
 
+    private String accessToken;
+
 
     public FileWalkerService(){
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
@@ -41,6 +41,9 @@ public class FileWalkerService {
 
     @Value("${esalida-rest-base-url}")
     String esalidaRestBaseUrl;
+
+    @Value("${access-token-file-name}")
+    String accessTokenFileName;
 
     @Async
     public CompletableFuture<String> callFileWalker(String drivePath) throws InterruptedException {
@@ -56,20 +59,6 @@ public class FileWalkerService {
             for (int i = 0; i < listOfFiles.length; i++) {
                 if (listOfFiles[i].isFile()) {
                     LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-
-//                    File file = new File(listOfFiles[i].getName());
-//                    FileItem fileItem = new DiskFileItem("mainFile", Files.probeContentType(file.toPath()), false, file.getName(), (int) file.length(), file.getParentFile());
-//
-//                    try {
-//                        InputStream input = new FileInputStream(file);
-//                        OutputStream os = fileItem.getOutputStream();
-//                        IOUtils.copy(input, os);
-//                    } catch (IOException ex) {
-//                        // do something.
-//                    }
-//
-//                    MultipartFile multipartFile = new CommonsMultipartFile(fileItem);
-
                     Path filePath = Paths.get(listOfFiles[i].getAbsolutePath());
                     String name = listOfFiles[i].getName();
                     String originalFileName = listOfFiles[i].getName();
@@ -88,11 +77,14 @@ public class FileWalkerService {
                     map.add("file", new FileSystemResource(originalFileName));
                     HttpHeaders headers = new HttpHeaders();
                     headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-                    headers.add("Authorization", "Bearer fa83a706-7a64-4727-b3d7-03e15df0dfa6");
-                    HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new    HttpEntity<LinkedMultiValueMap<String, Object>>(map, headers);
-                    try{
-                        ResponseEntity<String> result = restTemplate.exchange(esalidaRestBaseUrl+fileUpoadEndPoint, HttpMethod.POST, requestEntity, String.class);
+                    try {
+                        BufferedReader in = new BufferedReader(new FileReader(accessTokenFileName));
+                        accessToken = in.readLine();
+                        in.close();
+                        headers.add("Authorization", "Bearer "+accessToken);
+                        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new    HttpEntity<LinkedMultiValueMap<String, Object>>(map, headers);
 
+                        ResponseEntity<String> result = restTemplate.exchange(esalidaRestBaseUrl+fileUpoadEndPoint, HttpMethod.POST, requestEntity, String.class);
                     }
                     catch (Exception e){
                         e.printStackTrace();
