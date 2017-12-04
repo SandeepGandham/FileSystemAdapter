@@ -28,7 +28,7 @@ public class FileWalkerService {
 
     private RestTemplate restTemplate;
 
-    private String fileUpoadEndPoint = "/client/upload";
+    private String fileUpoadEndPoint = "/filesadapter/upload";
 
     private String accessToken;
 
