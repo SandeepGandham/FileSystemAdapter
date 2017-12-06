@@ -100,26 +100,88 @@
                 color: #909FA7;
             }
         </style>
-        <script>
+        <script th:inline="javascript">
+         var interval = null;
             function send(){
-            var values = new Array();
-            $.each($("input[name='CheckGroup[]']:checked"), function(){
-                values.push($(this).val());
-            });
-            var Json = {
-                "Key" : values };
-            $.ajax({
-                url: '/filewalker',
-                type: 'POST',
-                data: JSON.stringify(Json),
-                contentType: 'application/json',
-                dataType: 'json',
-                success: function(data){
-                    alert(data);
-                }
-            });
+                $('#process').css('display', 'block');
+                $('#processingStatus').text('In progress');
+                var values = new Array();
+                $.each($("input[name='CheckGroup[]']:checked"), function(){
+                    values.push($(this).val());
+                });
+                var Json = {
+                    "Key" : values };
+                $.ajax({
+                    url: '/filewalker/' + [[${userId}]],
+                    type: 'POST',
+                    data: JSON.stringify(Json),
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function(data){
+                        alert(data);
+                    }
+                });
+                interval = setInterval(processingStatus,10000);
+            }
+            function processingStatus(){
+            console.log("===");
 
-        }
+                $.ajax({
+                    url: '/files/status',
+                    type: 'GET',
+                    success: function(data){
+                        console.log("===", data);
+                        $('#processingStatus').text(data);
+                        if(data == 'In progress'){
+                            $('#processingStatus').css('color', 'orange');
+                        }
+                        if(data == 'Done')
+                        {
+                            $('#processingStatus').css('color', 'green');
+                            console.log("+++>>");
+                            clearInterval(interval);
+                            <!--$('#process').css('display', 'none');-->
+                            $('#upload').css('display', 'block');
+                            $('#uploadStatus').text('In progress');
+                            interval = setInterval(uploadStatus,10000);
+                        }
+                    }
+
+                });
+            }
+            function uploadStatus(){
+            console.log("===");
+
+                $.ajax({
+                    url: '/upload/status',
+                    type: 'GET',
+                    success: function(data){
+                        console.log("===", data);
+                        $('#uploadStatus').text(data);
+                        if(data != 'Done'){
+                            $('#uploadStatus').css('color', 'orange');
+                        }
+                        if(data == 'Done')
+                        {
+                            $('#uploadStatus').css('color', 'green');
+                            console.log("+++>>");
+                            clearInterval(interval);
+                            <!--$('#upload').css('display', 'none');-->
+                            $('#save').prop('disabled', false);
+                        }
+                    }
+
+                });
+            }
+            function index(){
+                $.ajax({
+                    url: '/start/' + [[${userId}]],
+                    type: 'GET',
+                    success: function(data){
+
+                    }
+                });
+            }
         </script>
         <script>
             $(document).ready(function() {
@@ -187,7 +249,7 @@
         </div>
     </nav>
     <div class="page-heading">
-        Welcome page
+        Drives
         <small>Use accordingly!</small>
     </div>
     <div class="panel panel-default col-md-8 col-md-offset-2">
@@ -217,15 +279,24 @@
                     </div>
                 </div>
             </div>
-            <div class="progress">
-                <div class="progress-bar" role="progressbar" aria-valuenow="40"
-                     aria-valuemin="0" aria-valuemax="100" style="width:40%">
-                    <p>40% Complete</p>
-                </div>
-            </div>
+            <!--<div class="progress">-->
+                <!--<div class="progress-bar" role="progressbar" aria-valuenow="40"-->
+                     <!--aria-valuemin="0" aria-valuemax="100" style="width:40%">-->
+                    <!--<p>40% Complete</p>-->
+                <!--</div>-->
+            <!--</div>-->
 
-            <div class="col-md-10 center-block">
+            <div>
+                <label id="process" style="display:none" >Processing Status : <span id="processingStatus" style="color:orange"></span></label>
+            </div>
+            <div>
+                <label id="upload" style="display:none" >Upload Status : <span id="uploadStatus" style="color:orange"></span></label>
+            </div>
+            <div class="col-md-10 center-block" style="margin-bottom:10px">
                 <button class="btn btn-normal center-block" th:onclick="'javascript:send()'">Proceed</button>
+            </div>
+            <div class="col-md-10 center-block">
+                <button id="save" class="btn btn-normal center-block" style="width:76px;" th:onclick="'javascript:index()'" disabled="true">Save</button>
             </div>
         </div>
     </div>

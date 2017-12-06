@@ -12,6 +12,9 @@ public class FileMetaData {
     String folderName;
     long size;
     String parent;
+    String path;
+    long userId;
+    private String documentId;
 
 
 
@@ -73,5 +76,30 @@ public class FileMetaData {
 
     public void setFolderName(String folderName) {
         this.folderName = folderName;
+    }
+
+
+    public String getDocumentId() {
+        return documentId;
+    }
+
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }

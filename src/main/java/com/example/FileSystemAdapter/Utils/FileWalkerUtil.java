@@ -14,20 +14,15 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 public class FileWalkerUtil implements FileVisitor<Path> {
 
-    private int counter = 0;
-
-    private int randomNum = 0;
-
     private static final Logger logger = LoggerFactory.getLogger(FileWalkerUtil.class);
 
-    private long maxFileSize = 10485760;
-    private String jsonFileName = "FilesMetaData";
-    private int i = 0;
-
     private RollingFileWriter rollingFileWriter;
+
+    private long userId;
 
     DateFormat df=new SimpleDateFormat("dd/MM/yyyy");
     Date date = new Date();
@@ -49,6 +44,7 @@ public class FileWalkerUtil implements FileVisitor<Path> {
             fileName = file.getFileName().toString().substring(0, file.getFileName().toString().lastIndexOf("."));
         }
         FileMetaData fileMetaData=new FileMetaData();
+        fileMetaData.setDocumentId(UUID.randomUUID().toString());
         fileMetaData.setFileName(fileName);
         fileMetaData.setParent(file.getParent().toString());
         fileMetaData.setContentType(file.getFileName().toString().substring(file.getFileName().toString().lastIndexOf(".") + 1));
@@ -61,9 +57,11 @@ public class FileWalkerUtil implements FileVisitor<Path> {
         date.setTime(attrs.lastModifiedTime().toMillis());
         lastModifiedTime = dateFormat.format(date);
         fileMetaData.setLastModifiedTime(lastModifiedTime);
-        fileMetaData.setFolderName(file.getParent().toString().substring(file.getParent().toString().lastIndexOf("\\") + 1));
+        //fileMetaData.setFolderName(file.getParent().toString().substring(file.getParent().toString().lastIndexOf("\\") + 1));
+        fileMetaData.setFolderName(file.getParent().toString().substring(file.getParent().toString().lastIndexOf("/") + 1));
         fileMetaData.setSize(attrs.size());
-//        fileMetaData.setPath(file.toString());
+        fileMetaData.setUserId(userId);
+        fileMetaData.setPath(file.toString());
         ObjectMapper objectMapper=new ObjectMapper();
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         String jsonInString = objectMapper.writeValueAsString(fileMetaData);
@@ -88,5 +86,10 @@ public class FileWalkerUtil implements FileVisitor<Path> {
         //rollingFileWriter = new RollingFileWriter(path.toString().substring(0, path.toString().length() - 2)+"drive/FilesMetaData", ".json",10485760);
         rollingFileWriter = new RollingFileWriter("jsons/FilesMetaData", ".json",10000000);
 
+    }
+
+    public void setUserId(long userIdfromService) {
+        System.out.println(userIdfromService);
+        userId = userIdfromService;
     }
 }

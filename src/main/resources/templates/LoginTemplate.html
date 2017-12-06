@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html  xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <title>login Page</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous"></link>
+
 </head>
 <style type="text/css">
 	.btn-lg
@@ -20,18 +22,18 @@
     <div class="col-md-6 mx-auto">
         <div class="card">
             <div class="card-header">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGh9t7oUEAh4OFfrL4NxQPmPLcZcqsYoRPFh5guWi6Ir-U0bkn" width="50px" height="50px">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGh9t7oUEAh4OFfrL4NxQPmPLcZcqsYoRPFh5guWi6Ir-U0bkn" width="50px" height="50px"></img>
             </div>
             <div class="col-md-10 offset-sm-1 text-center">
-                <form class="form" >
+                <form class="form" th:action="@{/checklogin}" th:object="${checkLoginPayload}" method="post" role="form">
                     <div class="card-body">
 
                         <div class="form-group">
-                            <input type="text" class="form-control form-control-lg" name="userName" placeholder="Email Id / userId">
+                            <input type="text" class="form-control form-control-lg" name="username" th:field="*{username}" placeholder="Email Id / userId" required="true"></input>
                         </div>
 
                         <div class="form-group">
-                            <input type="password" class="form-control form-control-lg" name="password" placeholder="password">
+                            <input type="password" class="form-control form-control-lg" name="password" th:field="*{password}" placeholder="password" required="true"></input>
                         </div>
 
                         <div>
