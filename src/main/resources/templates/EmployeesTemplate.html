@@ -126,33 +126,33 @@
     <div class="container-fluid">
         <div class="navbar-header">
             <!-- <a class="brand-logo"></a> -->
-            <img src="esalidalogo.png" class="navbar-brand img-responsive"></img>
+            <img src="../img/esalidalogo.png" class="navbar-brand img-responsive"></img>
         </div>
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Dashboard<span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">Email</a></li>
-                        <li><a href="#">Appointment</a></li>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="#">File</a></li>
-                    </ul>
-                </li>
+                <!--<li class="dropdown">-->
+                    <!--<a class="dropdown-toggle" data-toggle="dropdown" href="#">Dashboard<span class="caret"></span></a>-->
+                    <!--<ul class="dropdown-menu">-->
+                        <!--<li><a href="#">Email</a></li>-->
+                        <!--<li><a href="#">Appointment</a></li>-->
+                        <!--<li><a href="#">Contact</a></li>-->
+                        <!--<li><a href="#">File</a></li>-->
+                    <!--</ul>-->
+                <!--</li>-->
                 <li><a href="#">Employees</a></li>
-                <li><a href="#">Search</a></li>
-                <li><a href="#">Collection</a></li>
+                <!--<li><a href="#">Search</a></li>-->
+                <!--<li><a href="#">Collection</a></li>-->
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <p class="navbar-text">Shirisha</p>
+                <p class="navbar-text">Exit</p>
             </ul>
         </div>
     </div>
 </nav>
-<div class="page-heading">
-    Employees
-    <small>Use this page to navigate through your employee database!</small>
-</div>
+<!--<div class="page-heading">-->
+    <!--Employees-->
+    <!--<small>Use this page to navigate through your employee database!</small>-->
+<!--</div>-->
 <div class="col-md-12" >
     <div th:each="employee : ${employeeList}">
         <div class="panel panel-default col-md-3" style="margin-left=10px; margin-right=10px">
@@ -162,14 +162,14 @@
                         <i class="fa fa-ellipsis-v"></i>
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a th:href="@{'/data/' + ${employee.userId}}">Select User</a></li>
+                        <li><a th:href="@{'/data/' + ${employee.userId}  + '/' + ${employee.firstName} + ' ' + ${employee.lastName}}">Select User</a></li>
                         <!--<li><a href="#">Edit Profile</a></li>-->
                         <!--<li><a href="#">Contact</a></li>-->
                     </ul>
                 </div>
             </div>
             <div class="text-center">
-                <img class="center-block img-circle thumb64" src="./src/main/resources/img/user.png"></img>
+                <img class="center-block img-circle thumb64" src="../img/user.png"></img>
                 <h4 ><span th:text="${employee.firstName}"></span> <span th:text="${employee.lastName}"></span></h4>
                 <label class="label label-default">ADMIN</label>
                 <h5><span th:text="${employee.email}"></span></h5>

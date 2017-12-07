@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
@@ -24,7 +26,9 @@ public class FileWalkerUtil implements FileVisitor<Path> {
 
     private long userId;
 
-    DateFormat df=new SimpleDateFormat("dd/MM/yyyy");
+    private String userIdFileName = "UserId.txt";
+
+    DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
     Date date = new Date();
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a");
     String createdDateTime, lastAccessTime, lastModifiedTime;
@@ -36,14 +40,15 @@ public class FileWalkerUtil implements FileVisitor<Path> {
         logger.info(dir.toString());
         return FileVisitResult.CONTINUE;
     }
+
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         //System.out.format("visitFile: %s\n", file);
 //        System.out.println(java.nio.file.Files.getOwner(file));
-        if(file.getFileName().toString().indexOf(".") > 0){
+        if (file.getFileName().toString().indexOf(".") > 0) {
             fileName = file.getFileName().toString().substring(0, file.getFileName().toString().lastIndexOf("."));
         }
-        FileMetaData fileMetaData=new FileMetaData();
+        FileMetaData fileMetaData = new FileMetaData();
         fileMetaData.setDocumentId(UUID.randomUUID().toString());
         fileMetaData.setFileName(fileName);
         fileMetaData.setParent(file.getParent().toString());
@@ -60,9 +65,13 @@ public class FileWalkerUtil implements FileVisitor<Path> {
         //fileMetaData.setFolderName(file.getParent().toString().substring(file.getParent().toString().lastIndexOf("\\") + 1));
         fileMetaData.setFolderName(file.getParent().toString().substring(file.getParent().toString().lastIndexOf("/") + 1));
         fileMetaData.setSize(attrs.size());
+        BufferedReader in = new BufferedReader(new FileReader(userIdFileName));
+        String userIdFromFile = in.readLine();
+        in.close();
+        userId = Long.parseLong(userIdFromFile);
         fileMetaData.setUserId(userId);
         fileMetaData.setPath(file.toString());
-        ObjectMapper objectMapper=new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         String jsonInString = objectMapper.writeValueAsString(fileMetaData);
         logger.info(jsonInString);
@@ -70,11 +79,13 @@ public class FileWalkerUtil implements FileVisitor<Path> {
         //Files.write(jsonFile.toPath(), Arrays.asList(jsonInString), StandardOpenOption.APPEND);
         return FileVisitResult.CONTINUE;
     }
+
     @Override
     public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
         //System.out.format("visitFileFailed: %s\n", file);
         return FileVisitResult.CONTINUE;
     }
+
     @Override
     public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
         System.out.format("postVisitDirectory: %s\n", dir);
@@ -82,14 +93,9 @@ public class FileWalkerUtil implements FileVisitor<Path> {
         return FileVisitResult.CONTINUE;
     }
 
-    public void setDrivePath(Path path){
-        //rollingFileWriter = new RollingFileWriter(path.toString().substring(0, path.toString().length() - 2)+"drive/FilesMetaData", ".json",10485760);
-        rollingFileWriter = new RollingFileWriter("jsons/FilesMetaData", ".json",10000000);
+    public void setDrivePath(Path path) {
+        rollingFileWriter = new RollingFileWriter("jsons/FilesMetaData", ".json", 10000000);
 
     }
 
-    public void setUserId(long userIdfromService) {
-        System.out.println(userIdfromService);
-        userId = userIdfromService;
-    }
 }

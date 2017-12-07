@@ -101,7 +101,12 @@
             }
         </style>
         <script th:inline="javascript">
-         var interval = null;
+            <!--$('#empName').innerText([[${fullName}]]);-->
+            $( document ).ready(function() {
+                $('#empName').html("Selected Employee - "+ [[${fullName}]]);
+            });
+
+            var interval = null;
             function send(){
                 $('#process').css('display', 'block');
                 $('#processingStatus').text('In progress');
@@ -143,7 +148,7 @@
                             <!--$('#process').css('display', 'none');-->
                             $('#upload').css('display', 'block');
                             $('#uploadStatus').text('In progress');
-                            interval = setInterval(uploadStatus,10000);
+                            interval = setInterval(uploadStatus,2000);
                         }
                     }
 
@@ -225,33 +230,33 @@
         <div class="container-fluid">
             <div class="navbar-header">
                 <!-- <a class="brand-logo"></a> -->
-                <img src="esalidalogo.png" class="navbar-brand img-responsive"/>
+                <img src="../img/esalidalogo.png" class="navbar-brand img-responsive"/>
             </div>
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Dashboard<span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#">Email</a></li>
-                            <li><a href="#">Appointment</a></li>
-                            <li><a href="#">Contact</a></li>
-                            <li><a href="#">File</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#">Employees</a></li>
-                    <li><a href="#">Search</a></li>
-                    <li><a href="#">Collection</a></li>
+                    <!--<li class="dropdown">-->
+                        <!--<a class="dropdown-toggle" data-toggle="dropdown" href="#">Dashboard<span class="caret"></span></a>-->
+                        <!--<ul class="dropdown-menu">-->
+                            <!--<li><a href="#">Email</a></li>-->
+                            <!--<li><a href="#">Appointment</a></li>-->
+                            <!--<li><a href="#">Contact</a></li>-->
+                            <!--<li><a href="#">File</a></li>-->
+                        <!--</ul>-->
+                    <!--</li>-->
+                    <li><a href="#">Drives</a></li>
+                    <!--<li><a href="#">Search</a></li>-->
+                    <!--<li><a href="#">Collection</a></li>-->
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <p class="navbar-text">Shirisha</p>
+                    <p id="empName" class="navbar-text"></p>
                 </ul>
             </div>
         </div>
     </nav>
-    <div class="page-heading">
-        Drives
-        <small>Use accordingly!</small>
-    </div>
+    <!--<div class="page-heading">-->
+        <!--Drives-->
+        <!--<small>Use accordingly!</small>-->
+    <!--</div>-->
     <div class="panel panel-default col-md-8 col-md-offset-2">
         <div class="panel-title text-center">
             <h3>Processing Form</h3>

@@ -1,15 +1,20 @@
 package com.example.FileSystemAdapter.Controller;
 
 import com.example.FileSystemAdapter.Models.SelectedDrives;
+import com.example.FileSystemAdapter.Service.FileUploadService;
 import com.example.FileSystemAdapter.Service.FileWalkerService;
 import com.example.FileSystemAdapter.Utils.FilesStatus;
-import com.example.FileSystemAdapter.Utils.UploadStatus;
+import com.example.FileSystemAdapter.Utils.FilesUploadUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 public class FileWalkerController {
@@ -18,40 +23,40 @@ public class FileWalkerController {
 
     private final FileWalkerService fileWalkerService;
 
-    FileWalkerController(FileWalkerService fileWalkerService){
-        this.fileWalkerService=fileWalkerService;
+    private final FileUploadService fileUploadService;
+
+    private final FilesUploadUtil filesUploadUtil;
+
+    private String inProgress = "In progress";
+
+    FileWalkerController(FileWalkerService fileWalkerService, FileUploadService fileUploadService, FilesUploadUtil filesUploadUtil){
+        this.fileWalkerService = fileWalkerService;
+        this.fileUploadService = fileUploadService;
+        this.filesUploadUtil=filesUploadUtil;
     }
 
     @RequestMapping(value = "/filewalker/{userId}", method = RequestMethod.POST)
     public String fileWalker(@RequestBody SelectedDrives selectedDrives, @PathVariable long userId) throws Exception{
-
-//        long start = System.currentTimeMillis();
-//
-//        logger.info("Calling Async 1st time");
-//        CompletableFuture<String> folder1 = fileWalkerService.callFileWalker("/home/vivek/Sandeep/printName/src/main/java/com/example");
-//        logger.info("Calling Async 2nd time");
-//        CompletableFuture<String> folder2 = fileWalkerService.callFileWalker("/home/vivek/Sandeep/Java");
-//        CompletableFuture.allOf(folder1,folder2);
-
-        //System.out.println("Elapsed time: " + (System.currentTimeMillis() - start));
-//        System.out.println("--> " + folder1.get());
-//        System.out.println("--> " + folder2.get());
-        fileWalkerService.setUserId(userId);
+        FileWriter fileWriter = new FileWriter("UserId.txt", false);
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        bufferedWriter.write(String.valueOf(userId));
+        bufferedWriter.close();
         List<String> drives =  selectedDrives.getKey();
-        //CompletableFuture<List<String>> folder = new CompletableFuture<List<String>>();
+        List<CompletableFuture<String>> totalProcessingStatus = new ArrayList<CompletableFuture<String>>();
         System.out.println(userId);
+        FilesStatus filesStatus = new FilesStatus();
+        filesStatus.setFilesStatus(inProgress);
         for( String drive : drives){
-            //fileWalkerService.callFileWalker("/home/vivek/Sandeep");
-            fileWalkerService.callFileWalker(drive);
+            CompletableFuture<String> driveProcessingStatus = fileWalkerService.callFileWalker(drive);
+            totalProcessingStatus.add(driveProcessingStatus);
         }
+        fileUploadService.startFilesUpload(totalProcessingStatus);
         return "Finished";
     }
 
     @RequestMapping(value = "/upload/status", method = RequestMethod.GET)
     public String fileUploadStatus() throws IOException {
-        UploadStatus uploadStatus = new UploadStatus();
-        return fileWalkerService.getUpdateStatus();
-        //return uploadStatus.getUploadStatus();
+        return filesUploadUtil.getUpdateStatus();
     }
 
     @RequestMapping(value = "/files/status", method = RequestMethod.GET)

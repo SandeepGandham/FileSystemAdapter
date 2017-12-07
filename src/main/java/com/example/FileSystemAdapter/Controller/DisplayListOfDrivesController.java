@@ -63,8 +63,8 @@ public class DisplayListOfDrivesController {
     }
 
 
-    @RequestMapping(value = "data/{userId}", method = RequestMethod.GET)
-    String RoughTemplate(Model model, @PathVariable("userId") Long userId) throws JsonProcessingException{
+    @RequestMapping(value = "data/{userId}/{fullName}", method = RequestMethod.GET)
+    String RoughTemplate(Model model, @PathVariable("userId") Long userId, @PathVariable("fullName") String fullName) throws JsonProcessingException{
 
         System.out.println(userId);
 
@@ -73,6 +73,8 @@ public class DisplayListOfDrivesController {
         model.addAttribute("listDrives",listDrives);
 
         model.addAttribute("userId", userId);
+
+        model.addAttribute("fullName", fullName);
 
         return "DisplayDrivesTemplate";
 
