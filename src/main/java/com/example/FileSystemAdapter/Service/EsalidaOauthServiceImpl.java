@@ -2,6 +2,7 @@ package com.example.FileSystemAdapter.Service;
 
 import com.example.FileSystemAdapter.Models.AccessToken;
 import com.example.FileSystemAdapter.Models.Employee;
+import com.example.FileSystemAdapter.Utils.UserStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -22,9 +23,6 @@ public class EsalidaOauthServiceImpl implements EsalidaOauthService {
 
     @Value("${esalida-oauth-base-url}")
     String esalidaOauthBaseUrl;
-
-    @Value("${access-token-file-name}")
-    String accessTokenFileName;
 
     private  String tokenEndpoint= "/oauth/token";
 
@@ -52,10 +50,8 @@ public class EsalidaOauthServiceImpl implements EsalidaOauthService {
         HttpEntity requestEntity = new HttpEntity(headers);
         String loginUrl = esalidaOauthBaseUrl + tokenEndpoint + "?username=" + username + "&password=" + password + "&grant_type=" + grantType;
         ResponseEntity<AccessToken> result = restTemplate.exchange(loginUrl, HttpMethod.POST, requestEntity, AccessToken.class);
-        FileWriter fileWriter = new FileWriter("AccessToken.txt", false);
-        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-        bufferedWriter.write(result.getBody().getAccess_token());
-        bufferedWriter.close();
+        UserStore userStore = new UserStore();
+        userStore.setAccessToken(result.getBody().getAccess_token());
         List<Employee> employeeList = getAllEmployees();
         return employeeList;
     }
@@ -65,9 +61,8 @@ public class EsalidaOauthServiceImpl implements EsalidaOauthService {
 
         HttpHeaders headers = new HttpHeaders();
         String getAllEmployeesUrl = esalidaOauthBaseUrl+getAllEmployeesEndpoint;
-        BufferedReader in = new BufferedReader(new FileReader(accessTokenFileName));
-        accessToken = in.readLine();
-        in.close();
+        UserStore userStore = new UserStore();
+        accessToken = userStore.getAccessToken();
         headers.add("Authorization", "Bearer " + accessToken);
         HttpEntity requestEntity = new HttpEntity(headers);
         ResponseEntity<List<Employee>> result = restTemplate.exchange(getAllEmployeesUrl, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<List<Employee>>(){});

@@ -47,7 +47,7 @@ public class FilesUploadUtil {
     String accessTokenFileName;
 
 
-    private String userIdFileName="UserId.txt";
+
 
     public FilesUploadUtil(EsalidaRestService esalidaRestService){
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
@@ -62,10 +62,8 @@ public class FilesUploadUtil {
         File folder = new File("jsons");
         listOfFiles = folder.listFiles();
         logger.info("Starting upload process");
-        BufferedReader br = new BufferedReader(new FileReader(userIdFileName));
-        String userIdFromFile = br.readLine();
-        br.close();
-        userId = Long.parseLong(userIdFromFile);
+        UserStore userStore = new UserStore();
+        userId = userStore.getUserId();
         List<String> uploadedFilesInServer = esalidaRestService.getListOfUploadedFiles(userId);
         totalUploadedFiles.clear();
         totalUploadedFiles.addAll(uploadedFilesInServer);

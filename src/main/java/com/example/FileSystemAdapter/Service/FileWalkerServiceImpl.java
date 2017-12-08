@@ -1,7 +1,7 @@
 package com.example.FileSystemAdapter.Service;
 
 import com.example.FileSystemAdapter.Utils.FileWalkerUtil;
-import com.example.FileSystemAdapter.Utils.FilesStatus;
+import com.example.FileSystemAdapter.Utils.UserStore;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -36,8 +36,8 @@ public class FileWalkerServiceImpl implements FileWalkerService {
         FileWalkerUtil fileWalkerUtil = new FileWalkerUtil();
         fileWalkerUtil.setDrivePath(path);
         try {
-            FilesStatus filesStatus = new FilesStatus();
-            //filesStatus.setFilesStatus(inProgress);
+            UserStore userStore = new UserStore();
+            //userStore.setFilesStatus(inProgress);
             logger.info("Creating Json Files");
             Files.walkFileTree(path, fileWalkerUtil);
             logger.info("Json files are successfully created");

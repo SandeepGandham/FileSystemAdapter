@@ -1,6 +1,6 @@
 package com.example.FileSystemAdapter.Service;
 
-import com.example.FileSystemAdapter.Utils.FilesStatus;
+import com.example.FileSystemAdapter.Utils.UserStore;
 import com.example.FileSystemAdapter.Utils.FilesUploadUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +35,8 @@ public class FileUploadServiceImpl implements FileUploadService {
             for(CompletableFuture<String> result : totalProcessingStatus){
                 logger.info(result.get());
             }
-            FilesStatus filesStatus = new FilesStatus();
-            filesStatus.setFilesStatus(done);
+            UserStore userStore = new UserStore();
+            userStore.setFilesStatus(done);
             filesUploadUtil.uploadFiles();
 
         } catch (IOException e) {

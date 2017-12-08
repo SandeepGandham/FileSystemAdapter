@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
@@ -25,8 +23,6 @@ public class FileWalkerUtil implements FileVisitor<Path> {
     private RollingFileWriter rollingFileWriter;
 
     private long userId;
-
-    private String userIdFileName = "UserId.txt";
 
     DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
     Date date = new Date();
@@ -65,10 +61,8 @@ public class FileWalkerUtil implements FileVisitor<Path> {
         //fileMetaData.setFolderName(file.getParent().toString().substring(file.getParent().toString().lastIndexOf("\\") + 1));
         fileMetaData.setFolderName(file.getParent().toString().substring(file.getParent().toString().lastIndexOf("/") + 1));
         fileMetaData.setSize(attrs.size());
-        BufferedReader in = new BufferedReader(new FileReader(userIdFileName));
-        String userIdFromFile = in.readLine();
-        in.close();
-        userId = Long.parseLong(userIdFromFile);
+        UserStore userStore = new UserStore();
+        userId = userStore.getUserId();
         fileMetaData.setUserId(userId);
         fileMetaData.setPath(file.toString());
         ObjectMapper objectMapper = new ObjectMapper();

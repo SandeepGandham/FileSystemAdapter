@@ -3,14 +3,12 @@ package com.example.FileSystemAdapter.Controller;
 import com.example.FileSystemAdapter.Models.SelectedDrives;
 import com.example.FileSystemAdapter.Service.FileUploadService;
 import com.example.FileSystemAdapter.Service.FileWalkerService;
-import com.example.FileSystemAdapter.Utils.FilesStatus;
 import com.example.FileSystemAdapter.Utils.FilesUploadUtil;
+import com.example.FileSystemAdapter.Utils.UserStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,15 +35,12 @@ public class FileWalkerController {
 
     @RequestMapping(value = "/filewalker/{userId}", method = RequestMethod.POST)
     public String fileWalker(@RequestBody SelectedDrives selectedDrives, @PathVariable long userId) throws Exception{
-        FileWriter fileWriter = new FileWriter("UserId.txt", false);
-        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-        bufferedWriter.write(String.valueOf(userId));
-        bufferedWriter.close();
+        UserStore userStore = new UserStore();
+        userStore.setUserId(String.valueOf(userId));
         List<String> drives =  selectedDrives.getKey();
         List<CompletableFuture<String>> totalProcessingStatus = new ArrayList<CompletableFuture<String>>();
         System.out.println(userId);
-        FilesStatus filesStatus = new FilesStatus();
-        filesStatus.setFilesStatus(inProgress);
+        userStore.setFilesStatus(inProgress);
         for( String drive : drives){
             CompletableFuture<String> driveProcessingStatus = fileWalkerService.callFileWalker(drive);
             totalProcessingStatus.add(driveProcessingStatus);
@@ -61,7 +56,7 @@ public class FileWalkerController {
 
     @RequestMapping(value = "/files/status", method = RequestMethod.GET)
     public String jsonFilesStatus() throws IOException {
-        FilesStatus filesStatus = new FilesStatus();
-        return filesStatus.getFilesStatus();
+        UserStore userStore = new UserStore();
+        return userStore.getFilesStatus();
     }
 }

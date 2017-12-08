@@ -1,5 +1,6 @@
 package com.example.FileSystemAdapter.Service;
 
+import com.example.FileSystemAdapter.Utils.UserStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -10,8 +11,6 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
@@ -23,8 +22,7 @@ public class EsalidaRestServiceImpl implements EsalidaRestService{
     @Value("${esalida-rest-base-url}")
     String esalidaRestBaseUrl;
 
-    @Value("${access-token-file-name}")
-    String accessTokenFileName;
+
 
     private String accessToken;
 
@@ -42,9 +40,8 @@ public class EsalidaRestServiceImpl implements EsalidaRestService{
     public List<String> getListOfUploadedFiles(long userId) throws IOException {
         HttpHeaders headers = new HttpHeaders();
         String getListOfUploadedFilesUrl = esalidaRestBaseUrl+getListOfUploadedFilesEndpoint+userId;
-        BufferedReader in = new BufferedReader(new FileReader(accessTokenFileName));
-        accessToken = in.readLine();
-        in.close();
+        UserStore userStore = new UserStore();
+        accessToken = userStore.getAccessToken();
         headers.add("Authorization", "Bearer " + accessToken);
         HttpEntity requestEntity = new HttpEntity(headers);
         ResponseEntity<List<String>> result = restTemplate.exchange(getListOfUploadedFilesUrl, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<List<String>>(){});
@@ -56,9 +53,8 @@ public class EsalidaRestServiceImpl implements EsalidaRestService{
     public void startIndexing(long userId) throws IOException {
         HttpHeaders headers = new HttpHeaders();
         String startIndexingUrl = esalidaRestBaseUrl + startIndexingEndpoint + userId;
-        BufferedReader in = new BufferedReader(new FileReader(accessTokenFileName));
-        accessToken = in.readLine();
-        in.close();
+        UserStore userStore = new UserStore();
+        accessToken = userStore.getAccessToken();
         headers.add("Authorization", "Bearer " + accessToken);
         HttpEntity requestEntity = new HttpEntity(headers);
         ResponseEntity<Void> result = restTemplate.exchange(startIndexingUrl, HttpMethod.GET, requestEntity, Void.class);
