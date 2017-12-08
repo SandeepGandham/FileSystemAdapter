@@ -16,13 +16,13 @@ import java.io.IOException;
 import java.util.List;
 
 @Controller
-public class CheckLoginController {
+public class LoginController {
 
     private EsalidaOauthService esalidaOauthService;
 
 
     @Autowired
-    public CheckLoginController(EsalidaOauthService esalidaOauthService) {
+    public LoginController(EsalidaOauthService esalidaOauthService) {
         this.esalidaOauthService = esalidaOauthService;
 
     }
@@ -35,8 +35,9 @@ public class CheckLoginController {
         return "EmployeesTemplate";
     }
 
-
-
-
+    @RequestMapping(value = "login")
+    String login(Model model){
+        model.addAttribute("checkLoginPayload", new CheckLoginPayload());
+        return "LoginTemplate";
+    }
 }
-
