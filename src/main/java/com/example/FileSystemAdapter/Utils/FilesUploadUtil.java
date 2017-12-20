@@ -66,7 +66,9 @@ public class FilesUploadUtil {
         userId = userStore.getUserId();
         List<String> uploadedFilesInServer = esalidaRestService.getListOfUploadedFiles(userId);
         totalUploadedFiles.clear();
+        logger.info("Total uploaded files - " + totalUploadedFiles.size());
         totalUploadedFiles.addAll(uploadedFilesInServer);
+        logger.info("Already uploaded files - " + totalUploadedFiles.size());
         for (int i = 0; i < listOfFiles.length; i++) {
             if (listOfFiles[i].isFile()) {
                 for (String file:uploadedFilesInServer) {
@@ -107,6 +109,7 @@ public class FilesUploadUtil {
                         e.printStackTrace();
                     }
                     totalUploadedFiles.add(listOfFiles[i].getName());
+                    logger.info("Total uploaded files - " + totalUploadedFiles.size());
                     File file = new File(listOfFiles[i].getName());
                     file.delete();
 
@@ -125,6 +128,7 @@ public class FilesUploadUtil {
         if (totalFilesCount == uploadedFilesCount){
             return done;
         }
+        logger.info("Upload status - " + uploadedFilesCount+" out of "+totalFilesCount+" are uploaded");
         return (uploadedFilesCount+" out of "+totalFilesCount+" are uploaded");
     }
 

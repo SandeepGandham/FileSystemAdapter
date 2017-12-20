@@ -1,7 +1,10 @@
 package com.example.FileSystemAdapter.Utils;
 
+import org.springframework.stereotype.Component;
+
 import java.io.*;
 
+@Component
 public class UserStore {
 
     private String filesStatusFileName = "FileStatus.txt";
@@ -9,7 +12,6 @@ public class UserStore {
     private String userIdFileName="UserId.txt";
 
     private String accessTokenFileName="AccessToken.txt";
-
 
     public void setFilesStatus(String status) throws IOException {
         FileWriter fileWriter = new FileWriter(filesStatusFileName, false);

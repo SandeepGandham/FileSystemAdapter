@@ -151,7 +151,7 @@
 </nav>
 <div class="page-heading">
     Employees
-    <!--<small>Use this page to navigate through your employee database!</small>-->
+    <small>Use this page to navigate through your employee database!</small>
 </div>
 <div class="col-md-12" >
     <div th:each="employee : ${employeeList}">
@@ -171,7 +171,7 @@
             <div class="text-center">
                 <img class="center-block img-circle thumb64" src="../images/user.png"></img>
                 <h4 ><span th:text="${employee.firstName}"></span> <span th:text="${employee.lastName}"></span></h4>
-                <label class="label label-default">ADMIN</label>
+                <label class="label label-default"><span th:text="${employee.roles}"></span></label>
                 <h5><span th:text="${employee.email}"></span></h5>
             </div>
         </div>
