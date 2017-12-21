@@ -1,6 +1,6 @@
 package com.example.FileSystemAdapter.Utils;
 
-import com.example.FileSystemAdapter.Models.FileMetaData;
+import com.example.FileSystemAdapter.Models.EsalidaFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.slf4j.Logger;
@@ -11,8 +11,8 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
@@ -22,11 +22,12 @@ public class FileWalkerUtil implements FileVisitor<Path> {
 
     private RollingFileWriter rollingFileWriter;
 
+    private String storageType = "localFile";
+
     private long userId;
 
-    DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
     Date date = new Date();
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a");
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     String createdDateTime, lastAccessTime, lastModifiedTime;
     String fileName;
 
@@ -39,38 +40,35 @@ public class FileWalkerUtil implements FileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        //System.out.format("visitFile: %s\n", file);
-//        System.out.println(java.nio.file.Files.getOwner(file));
+//        System.out.println("owner - " + java.nio.file.Files.getOwner(file));
         if (file.getFileName().toString().indexOf(".") > 0) {
             fileName = file.getFileName().toString().substring(0, file.getFileName().toString().lastIndexOf("."));
         }
-        FileMetaData fileMetaData = new FileMetaData();
-        fileMetaData.setDocumentId(UUID.randomUUID().toString());
-        fileMetaData.setFileName(fileName);
-        fileMetaData.setParent(file.getParent().toString());
-        fileMetaData.setContentType(file.getFileName().toString().substring(file.getFileName().toString().lastIndexOf(".") + 1));
+        EsalidaFile esalidaFile = new EsalidaFile();
+        esalidaFile.setDocumentId(UUID.randomUUID().toString());
+        esalidaFile.setFileName(fileName);
+        esalidaFile.setParentReference(file.getParent().toString());
+        esalidaFile.setExtension(file.getFileName().toString().substring(file.getFileName().toString().lastIndexOf(".") + 1));
         date.setTime(attrs.creationTime().toMillis());
         createdDateTime = dateFormat.format(date);
-        fileMetaData.setCreatedTime(createdDateTime);
-        date.setTime(attrs.lastAccessTime().toMillis());
-        lastAccessTime = dateFormat.format(date);
-        fileMetaData.setLastAccessTime(lastAccessTime);
+        esalidaFile.setCreatedDateTime(createdDateTime);
         date.setTime(attrs.lastModifiedTime().toMillis());
         lastModifiedTime = dateFormat.format(date);
-        fileMetaData.setLastModifiedTime(lastModifiedTime);
-        //fileMetaData.setFolderName(file.getParent().toString().substring(file.getParent().toString().lastIndexOf("\\") + 1));
-        fileMetaData.setFolderName(file.getParent().toString().substring(file.getParent().toString().lastIndexOf("/") + 1));
-        fileMetaData.setSize(attrs.size());
+        esalidaFile.setLastModifiedDateTime(lastModifiedTime);
+        //esalidaFile.setFolderName(file.getParent().toString().substring(file.getParent().toString().lastIndexOf("\\") + 1));
+        esalidaFile.setFolderName(file.getParent().toString().substring(file.getParent().toString().lastIndexOf("/") + 1));
+        esalidaFile.setSize(attrs.size());
         UserStore userStore = new UserStore();
         userId = userStore.getUserId();
-        fileMetaData.setUserId(userId);
-        fileMetaData.setPath(file.toString());
+        esalidaFile.setUserId(Long.toString(userId));
+        esalidaFile.setTimeSeries(lastModifiedTime);
+        esalidaFile.setStorageType(storageType);
+        esalidaFile.setIndexDateTime(dateFormat.format(Calendar.getInstance().getTime()));
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        String jsonInString = objectMapper.writeValueAsString(fileMetaData);
+        String jsonInString = objectMapper.writeValueAsString(esalidaFile);
         logger.info(jsonInString);
         rollingFileWriter.write(jsonInString);
-        //Files.write(jsonFile.toPath(), Arrays.asList(jsonInString), StandardOpenOption.APPEND);
         return FileVisitResult.CONTINUE;
     }
 
