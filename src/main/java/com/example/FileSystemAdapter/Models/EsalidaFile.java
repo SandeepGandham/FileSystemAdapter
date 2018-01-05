@@ -24,6 +24,7 @@ public class EsalidaFile {
     private String timeSeries;
     private String storageType;
     private String indexDateTime;
+    private String content;
 
 
     public String getCreatedDateTime() {
@@ -153,5 +154,13 @@ public class EsalidaFile {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 }

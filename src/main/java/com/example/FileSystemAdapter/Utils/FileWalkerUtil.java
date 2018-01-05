@@ -3,6 +3,8 @@ package com.example.FileSystemAdapter.Utils;
 import com.example.FileSystemAdapter.Models.EsalidaFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.apache.tika.Tika;
+import org.apache.tika.exception.TikaException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,9 +14,7 @@ import java.nio.file.FileVisitor;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 public class FileWalkerUtil implements FileVisitor<Path> {
 
@@ -25,6 +25,8 @@ public class FileWalkerUtil implements FileVisitor<Path> {
     private String storageType = "localFile";
 
     private long userId;
+
+    private static final Set<String> validExtensions = new HashSet<String>(Arrays.asList("docx","doc","ppt","pptx","xls","xlsx","pdf","txt"));
 
     Date date = new Date();
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -47,16 +49,24 @@ public class FileWalkerUtil implements FileVisitor<Path> {
         EsalidaFile esalidaFile = new EsalidaFile();
         esalidaFile.setDocumentId(UUID.randomUUID().toString());
         esalidaFile.setFileName(fileName);
-        esalidaFile.setParentReference(file.getParent().toString());
+        esalidaFile.setParentReference(file.getParent().toString().substring(file.getParent().toString().indexOf('\\') + 1));
         esalidaFile.setExtension(file.getFileName().toString().substring(file.getFileName().toString().lastIndexOf(".") + 1));
+        if (validExtensions.contains(esalidaFile.getExtension())) {
+            Tika tika = new Tika();
+            try {
+                esalidaFile.setContent(tika.parseToString(file));
+            } catch (TikaException e) {
+                e.printStackTrace();
+            }
+        }
         date.setTime(attrs.creationTime().toMillis());
         createdDateTime = dateFormat.format(date);
         esalidaFile.setCreatedDateTime(createdDateTime);
         date.setTime(attrs.lastModifiedTime().toMillis());
         lastModifiedTime = dateFormat.format(date);
         esalidaFile.setLastModifiedDateTime(lastModifiedTime);
-        //esalidaFile.setFolderName(file.getParent().toString().substring(file.getParent().toString().lastIndexOf("\\") + 1));
-        esalidaFile.setFolderName(file.getParent().toString().substring(file.getParent().toString().lastIndexOf("/") + 1));
+        esalidaFile.setFolderName(file.getParent().toString().substring(file.getParent().toString().lastIndexOf("\\") + 1));
+        //esalidaFile.setFolderName(file.getParent().toString().substring(file.getParent().toString().lastIndexOf("/") + 1));
         esalidaFile.setSize(attrs.size());
         UserStore userStore = new UserStore();
         userId = userStore.getUserId();
