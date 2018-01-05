@@ -3,6 +3,7 @@ package com.example.FileSystemAdapter.Service;
 import com.example.FileSystemAdapter.Utils.FileWalkerUtil;
 import com.example.FileSystemAdapter.Utils.UserStore;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -28,12 +29,15 @@ public class FileWalkerServiceImpl implements FileWalkerService {
     @Value("${access-token-file-name}")
     String accessTokenFileName;
 
+    @Autowired
+    FileWalkerUtil fileWalkerUtil;
+
 
     @Async
     public CompletableFuture<String> callFileWalker(String drivePath) throws InterruptedException {
 
         Path path = Paths.get(drivePath);
-        FileWalkerUtil fileWalkerUtil = new FileWalkerUtil();
+        //FileWalkerUtil fileWalkerUtil = new FileWalkerUtil();
         fileWalkerUtil.setDrivePath(path);
         try {
             UserStore userStore = new UserStore();

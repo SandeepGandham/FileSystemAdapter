@@ -7,6 +7,8 @@ import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -16,6 +18,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@Component
 public class FileWalkerUtil implements FileVisitor<Path> {
 
     private static final Logger logger = LoggerFactory.getLogger(FileWalkerUtil.class);
@@ -26,7 +29,8 @@ public class FileWalkerUtil implements FileVisitor<Path> {
 
     private long userId;
 
-    private static final Set<String> validExtensions = new HashSet<String>(Arrays.asList("docx","doc","ppt","pptx","xls","xlsx","pdf","txt"));
+    @Value("#{'${valid.extensions.list}'.split(',')}")
+    private String[] validExtensions;
 
     Date date = new Date();
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -51,12 +55,14 @@ public class FileWalkerUtil implements FileVisitor<Path> {
         esalidaFile.setFileName(fileName);
         esalidaFile.setParentReference(file.getParent().toString().substring(file.getParent().toString().indexOf('\\') + 1));
         esalidaFile.setExtension(file.getFileName().toString().substring(file.getFileName().toString().lastIndexOf(".") + 1));
-        if (validExtensions.contains(esalidaFile.getExtension())) {
-            Tika tika = new Tika();
-            try {
-                esalidaFile.setContent(tika.parseToString(file));
-            } catch (TikaException e) {
-                e.printStackTrace();
+        for (String validExtension:validExtensions ) {
+            if (validExtension.equals(esalidaFile.getExtension())) {
+                Tika tika = new Tika();
+                try {
+                    esalidaFile.setContent(tika.parseToString(file));
+                } catch (TikaException e) {
+                    e.printStackTrace();
+                }
             }
         }
         date.setTime(attrs.creationTime().toMillis());
