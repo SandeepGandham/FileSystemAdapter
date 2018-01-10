@@ -11,6 +11,6 @@ public interface EsalidaOauthService {
 
     public List<Employee> getAllEmployees() throws IOException;
 
-
+    public void getAccessTokenByRefreshToken();
 
 }

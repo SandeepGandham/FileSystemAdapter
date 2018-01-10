@@ -4,6 +4,8 @@ public class AccessToken {
 
     String access_token;
 
+    private String refresh_token;
+
     String token_type;
 
     int expires_in;
@@ -40,5 +42,13 @@ public class AccessToken {
 
     public void setScope(String scope) {
         this.scope = scope;
+    }
+
+    public String getRefresh_token() {
+        return refresh_token;
+    }
+
+    public void setRefresh_token(String refresh_token) {
+        this.refresh_token = refresh_token;
     }
 }

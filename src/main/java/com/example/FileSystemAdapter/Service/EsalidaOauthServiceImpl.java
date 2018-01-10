@@ -28,10 +28,13 @@ public class EsalidaOauthServiceImpl implements EsalidaOauthService {
 
     private String accessToken;
 
+    private String refreshToken;
 
     private String getAllEmployeesEndpoint="/api/admin/employee/all";
 
-    private  String grantType="password";
+    private String passwordGrantType="password";
+
+    private String tokenGrantType="refresh_token";
 
     public EsalidaOauthServiceImpl(){
 
@@ -48,10 +51,11 @@ public class EsalidaOauthServiceImpl implements EsalidaOauthService {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Basic b2F1dGgtY2xpZW50OnNlY3JldA==");
         HttpEntity requestEntity = new HttpEntity(headers);
-        String loginUrl = esalidaOauthBaseUrl + tokenEndpoint + "?username=" + username + "&password=" + password + "&grant_type=" + grantType;
+        String loginUrl = esalidaOauthBaseUrl + tokenEndpoint + "?username=" + username + "&password=" + password + "&grant_type=" + passwordGrantType;
         ResponseEntity<AccessToken> result = restTemplate.exchange(loginUrl, HttpMethod.POST, requestEntity, AccessToken.class);
         UserStore userStore = new UserStore();
         userStore.setAccessToken(result.getBody().getAccess_token());
+        userStore.setRefreshToken(result.getBody().getRefresh_token());
         List<Employee> employeeList = getAllEmployees();
         return employeeList;
     }
@@ -68,6 +72,23 @@ public class EsalidaOauthServiceImpl implements EsalidaOauthService {
         ResponseEntity<List<Employee>> result = restTemplate.exchange(getAllEmployeesUrl, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<List<Employee>>(){});
         return result.getBody();
 
+    }
+
+    @Override
+    public void getAccessTokenByRefreshToken(){
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION,"Basic b2F1dGgtY2xpZW50OnNlY3JldA==" );
+        HttpEntity requestEntity = new HttpEntity(headers);
+        UserStore userStore = new UserStore();
+        try {
+            refreshToken = userStore.getRefreshToken();
+            String tokenUrl = esalidaOauthBaseUrl + tokenEndpoint + "?grant_type=" + tokenGrantType + "&refresh_token="
+                    +refreshToken;
+            ResponseEntity<AccessToken> result = restTemplate.exchange(tokenUrl, HttpMethod.POST, requestEntity, AccessToken.class);
+            userStore.setAccessToken(result.getBody().getAccess_token());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 

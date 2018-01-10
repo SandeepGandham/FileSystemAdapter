@@ -13,6 +13,8 @@ public class UserStore {
 
     private String accessTokenFileName="AccessToken.txt";
 
+    private String refreshTokenFileName = "RefreshToken.txt";
+
     public void setFilesStatus(String status) throws IOException {
         FileWriter fileWriter = new FileWriter(filesStatusFileName, false);
         BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
@@ -53,5 +55,19 @@ public class UserStore {
         String accessToken = in.readLine();
         in.close();
         return accessToken;
+    }
+
+    public void setRefreshToken(String refreshToken) throws IOException {
+        FileWriter fileWriter = new FileWriter(refreshTokenFileName, false);
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        bufferedWriter.write(refreshToken);
+        bufferedWriter.close();
+    }
+
+    public String getRefreshToken() throws IOException {
+        BufferedReader in = new BufferedReader(new FileReader(refreshTokenFileName));
+        String refreshToken = in.readLine();
+        in.close();
+        return refreshToken;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.FileSystemAdapter.Utils;
 
+import com.example.FileSystemAdapter.Service.EsalidaOauthService;
 import com.example.FileSystemAdapter.Service.EsalidaRestService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +10,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +34,8 @@ public class FilesUploadUtil {
 
     private EsalidaRestService esalidaRestService;
 
+    private EsalidaOauthService esalidaOauthService;
+
     private long userId;
 
     private String done = "Done";
@@ -49,11 +53,12 @@ public class FilesUploadUtil {
 
 
 
-    public FilesUploadUtil(EsalidaRestService esalidaRestService){
+    public FilesUploadUtil(EsalidaRestService esalidaRestService, EsalidaOauthService esalidaOauthService){
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setBufferRequestBody(false);
         this.restTemplate = new RestTemplate(requestFactory);
         this.esalidaRestService=esalidaRestService;
+        this.esalidaOauthService=esalidaOauthService;
     }
 
 
@@ -103,7 +108,20 @@ public class FilesUploadUtil {
                         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<LinkedMultiValueMap<String, Object>>(map, headers);
                         String uploadUrl = esalidaRestBaseUrl + fileUpoadEndPoint + userId;
                         logger.info("Uploading " + listOfFiles[i].getName() + " to esalida-rest");
-                        ResponseEntity<String> result = restTemplate.exchange(uploadUrl, HttpMethod.POST, requestEntity, String.class);
+                        try {
+                            ResponseEntity<String> result = restTemplate.exchange(uploadUrl, HttpMethod.POST, requestEntity, String.class);
+                        }
+                        catch (HttpClientErrorException e) {
+                            //System.out.println(e.getStatusCode());
+                            if (e.getStatusCode() == HttpStatus.UNAUTHORIZED){
+                                esalidaOauthService.getAccessTokenByRefreshToken();
+                                accessToken = userStore.getAccessToken();
+                                HttpHeaders newHeaders = new HttpHeaders();
+                                newHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
+                                HttpEntity<LinkedMultiValueMap<String, Object>> newRequestEntity = new HttpEntity<LinkedMultiValueMap<String, Object>>(map, newHeaders);
+                                ResponseEntity<String> response = restTemplate.exchange(uploadUrl, HttpMethod.POST, newRequestEntity, String.class);
+                            }
+                        }
                         logger.info(listOfFiles[i].getName() + " is uploaded successfully");
                     } catch (Exception e) {
                         e.printStackTrace();
